@@ -8,30 +8,41 @@ library(data.table)
 library(dplyr)
 library(sf)
 library(mapview)
+library(sprawl)
 
-in_folder  <- "/home/lb/nr_working/shared/PhenoRice/Processing/Senegal/may_2017/Outputs_MaskIrrig/"
-out_folder <- "/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/statistics_modis"
-out_stats_file  <- "/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/statistics_modis/Stats_Phenorice_srv.RData"
-out_stats_file_extract  <- "/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/statistics_modis/extract_Phenorice_srv.RData"
+setwd("/home/lb/nr_working/shared/PhenoRice/Processing/Senegal/Final")
+
+in_folder       <- file.path(getwd(), "/Outputs_MaskIrrig")
+out_folder      <- "/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/statistics_modis"
+gd_folder       <- "/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/"
+out_stats_file  <- file.path(out_folder, "Stats_Phenorice_srv.RData")
+out_stats_file_extract  <- file.path(out_folder,"extract_Phenorice_srv.RData")
+
+r = read_rast(file.path(in_folder, "/2003/Phenorice_out_2002_321_2004_089.dat"))
 
 years      <- paste0(seq(2003,2016,1),"/")
 in_folders <- file.path(in_folder, years)
 
-gadm_data_3 <- readshape("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/Ancillary/gadm/SEN_adm3.shp") %>%
+gadm_data_3 <- read_vect(file.path(gd_folder, "/Datasets/Ancillary/gadm/SEN_adm3.shp")) %>%
   st_transform((proj4string(r)))
 
-gadm_data_4 <- readshape("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/Ancillary/gadm/SEN_adm4.shp")%>%
+gadm_data_4 <- read_vect(file.path(gd_folder, "Datasets/Ancillary/gadm/SEN_adm4.shp")) %>%
   st_transform((proj4string(r)))
 
-validation_delta <- readshape("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/Pheno_Validation/validation_delta.shp") %>%
-  st_transform((proj4string(r)))
+validation_delta <- read_vect(file.path(gd_folder, "Datasets/Pheno_Validation/validation_delta.shp")) %>%
+  st_transform((proj4string(r))) %>%
+  st_as_sf()
 
-validation_delta = readOGR("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/Pheno_Validation/", "validation_delta") %>%
-  st_as_sf() %>%
-  st_transform((proj4string(r)))
+validation_valley <- read_vect(file.path(gd_folder, "Datasets/Pheno_Validation/validation_valley.shp")) %>%
+  st_transform((proj4string(r))) %>%
+  st_as_sf()
+#
+# validation_delta = readOGR("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/Pheno_Validation/", "validation_delta") %>%
+#   st_as_sf() %>%
+#   st_transform((proj4string(r)))
 
 
-validation_valley = readOGR("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/Pheno_Validation/", "validation_valley") %>%
+validation_valley = read_vect("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/Pheno_Validation/", "validation_valley") %>%
   st_as_sf() %>%
   st_transform((proj4string(r)))
 
@@ -42,10 +53,8 @@ validation_valley = readOGR("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRi
 # gadm_data$ymax = as.numeric(ymaxs)
 gadm_data_3  = as(gadm_data_3, "Spatial")
 gadm_data_4  = as(gadm_data_4, "Spatial")
-validation_delta = as(validation_delta, "Spatial")
-validation_valley = as(validation_valley, "Spatial")
-
-r = raster("/home/lb/nr_working/shared/PhenoRice/Processing/Senegal/may_2017/Outputs_MaskIrrig//2003/Phenorice_out_2002_321_2004_089.dat")
+validation_delta = as(st_zm(validation_delta), "Spatial")
+validation_valley = as(st_zm(validation_valley), "Spatial")
 
 gadm_raster3   = rasterize(gadm_data_3, r, field = "ID_3")
 gadm_raster4   = rasterize(gadm_data_4, r, field = "ID_4")
@@ -129,6 +138,6 @@ statsdt_melt <- statsdt %>%
   filter(!is.na(value))
   dir.create(dirname(out_stats_file))
 
-  save(stats, file = out_stats_file_extract)
+ save(stats, file = out_stats_file_extract)
  save(statsdt, statsdt_melt,  file = out_stats_file)
 
