@@ -1,5 +1,4 @@
 # Figure area comparison PhenoRice vs Official
-#
 
 library(dplyr)
 library(ggplot2)
@@ -12,13 +11,10 @@ library(data.table)
 #
 
 # load("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/statistics_modis/extract_rast_mask_srv.RData")
-load("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/statistics_modis/extract_rast_mask_ONLY_SEN.RData")
-
-load("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/statistics_modis/extract_Phenorice_final_maskirrig_newvalvalley_november_1000_valleybig_16.RData")
-
+load("/home/lb/Google_Drive/IREA/MI_Conference&paper/Busetto_PhenoRice_SRV/Datasets/statistics_modis/Final/extract_Phenorice_Final_senegal_only.RData")
 
 # load("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/statistics_modis/extract_Phenorice_srv_nov_17.RData")
-in_areafile = "/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/Area_Validation/Official_Areas.csv"
+in_areafile = "/home/lb/Google_Drive/IREA/MI_Conference&paper/Busetto_PhenoRice_SRV/Datasets/Area_Validation/Official_Areas.csv"
 off_area <- read.csv(in_areafile)
 
 tot_area <- off_area %>%
@@ -30,7 +26,7 @@ tot_area <- off_area %>%
   group_by(Season) %>%
   mutate(delta_mean = 100 * ((Area) - mean(Area)) / mean(Area, na.rm = T))
 
- # tot_area$Area[(tot_area$Year %in% c(2011 )) ] = NA
+# tot_area$Area[(tot_area$Year %in% c(2011 )) ] = NA
 # Barplot official areas
 
 p_off <- ggplot(tot_area, aes(x = factor(Year), y = Area, fill = Season)) +
@@ -43,7 +39,7 @@ p_off <- ggplot(tot_area, aes(x = factor(Year), y = Area, fill = Season)) +
   theme(legend.position = c(0.1,0.90), legend.box.background = element_rect(),
         legend.box.margin = margin(1,1,1,1)) +
   xlab("Year")
-  p_off
+p_off
 
 
 # Compute the PhenoRice areas
@@ -137,11 +133,11 @@ gridExtra::grid.arrange(p1,p2)
 
 
 ggplot(data_all, aes(x = Off_Area, y = PhenoRice_Area, color = Season, label = Year)) +
- geom_point() + theme_bw() + geom_text(nudge_y = 1000) + geom_smooth(method = "lm") +
- geom_hline(yintercept = 0, colour = "grey70", size = 0.5) +
- geom_vline(xintercept = 0, colour = "grey70", size = 0.5) +
- xlim(-1000, 45000) + ylim(-1000,45000) +
- scale_colour_manual(values = c("darkred", "darkgreen")) +
- ylab("PhenoRice estimated rice area [ha]") + xlab("SEAD rice area [ha]") +
- geom_abline(slope = 1)
+  geom_point() + theme_bw() + geom_text(nudge_y = 1000) + geom_smooth(method = "lm") +
+  geom_hline(yintercept = 0, colour = "grey70", size = 0.5) +
+  geom_vline(xintercept = 0, colour = "grey70", size = 0.5) +
+  xlim(-1000, 45000) + ylim(-1000,45000) +
+  scale_colour_manual(values = c("darkred", "darkgreen")) +
+  ylab("PhenoRice estimated rice area [ha]") + xlab("SEAD rice area [ha]") +
+  geom_abline(slope = 1)
 

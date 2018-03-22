@@ -8,9 +8,9 @@ library(magrittr)
 library(tidyr)
 library(data.table)
 
-res_folder <- "/home/lb/nr_working/shared/PhenoRice/Processing/Senegal/Final/Outputs_MaskIrrig/"
+res_folder <- "/home/lb/nr_working/shared/PhenoRice/Processing/Senegal/Final/lgtthresh_noshape/outputs/"
 setwd(res_folder)
-in_2003 <- raster::stack("2003/Phenorice_out_2002_321_2004_089.dat")
+in_2003 <- raster::stack("2003/Phenorice_out_2002_313_2004_129.dat")
 in_2016 <- raster::stack("2016/Phenorice_out_2015_321_2017_089.dat")
 
 which_dry_2003 <- which(!is.na(getValues(in_2003[[2]])))

@@ -11,25 +11,35 @@ library(mapview)
 library(sprawl)
 
 
-setwd("/home/lb/nr_working/shared/PhenoRice/Processing/Senegal/Final/")
+setwd("/home/lb/nr_working/shared/PhenoRice/Processing/Senegal/Final/Outputs_MaskIrrig/")
 
-in_folder  <- file.path(getwd(), "/Outputs_MaskIrrig")
+setwd("/home/lb/nr_working/shared/PhenoRice/Processing/Senegal/processing_Nov_17/mask_irrig/thresh_1000/outputs/")
+in_folder  <- file.path(getwd())
 out_folder <- "/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/statistics_modis"
 gd_folder  <- "/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/"
-out_stats_file  <- file.path(out_folder, "Stats_Phenorice_srv.RData")
-out_stats_file_extract  <- file.path(out_folder,"extract_Phenorice_srv.RData")
+# out_stats_file  <- file.path(out_folder, "Stats_Phenorice_srv.RData")
+# out_stats_file_extract  <- file.path(out_folder,"extract_Phenorice_final_maskirrig.RData")
 
+# extracting here all the data (not only on Senegal!!!!)
+out_stats_file_extract  <- file.path(out_folder,"extract_Phenorice_final_maskirrig_newvalvalley_november_1000_valleybig_alldata.RData")
 
-r = read_rast(file.path(in_folder, "/2003/Phenorice_out_2002_321_2004_089.dat"))
+# "2003/Phenorice_out_2002_313_2004_129.dat"
+
+# r = read_rast(file.path(in_folder, "2003/Phenorice_out_2002_321_2004_089.dat"))
+r = read_rast("2003/Phenorice_out_2002_313_2004_129.dat")
 
 years      <- paste0(seq(2003,2016,1),"/")
 in_folders <- file.path(in_folder, years)
 
+# use this to extract  only on Senegal!!!!! (i.e., for area comparison purposes)
 sen_bounds <- get_boundaries("SEN", level = 0)
 
-# sen_bounds <- read_vect("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/SRV units.kmz") %>%
-#   dissolve_vect(dissolve_var = "description")
 
+# use this to extract not only on Senegal!!!!!
+#
+# # sen_bounds <- read_vect("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/SRV units.kmz") %>%
+# #   dissolve_vect(dissolve_var = "description")
+#
 
 # sen_bounds <- read_vect("/home/lb/nr_working/shared/PhenoRice/Processing/Senegal/Final/ancillary/mask_srv.shp")
 
@@ -41,8 +51,9 @@ validation_delta <- read_vect(
 
 validation_valley <- read_vect(
   file.path(gd_folder, "Datasets/Pheno_Validation/validation_valley.shp")) %>%
-  st_transform((proj4string(r))) %>%
-  dplyr::select(Name)
+  st_transform((proj4string(r)))
+# %>%
+#   dplyr::select(id)
 
 
 
@@ -60,15 +71,15 @@ for (yy in 1:length(years)) {
   in_file <- list.files(in_folders[[yy]], pattern = 'Phenorice_out?',
                         full.names = TRUE)[1]
   inrast  <- read_rast(in_file)
-  if (yy != 14) {
-    names(inrast) <- c("N_seas", "SOS_1", "SOS_2", "FOS_1", "FOS_2", "EOS_1",
-                       "EOS_2", "VGTCEVI_1", "VGTCEVI_2", "VGT_LG_1", "VGT_LG_2", "LG_1",
-                       "LG_2")
-  } else {
+  # if (yy != 14) {
+  #   names(inrast) <- c("N_seas", "SOS_1", "SOS_2", "FOS_1", "FOS_2", "EOS_1",
+  #                      "EOS_2", "VGTCEVI_1", "VGTCEVI_2", "VGT_LG_1", "VGT_LG_2", "LG_1",
+  #                      "LG_2")
+  # } else {
     names(inrast) <- c("N_seas", "SOS_1", "SOS_2", "FOS_1", "FOS_2", "EOS_1",
                        "EOS_2", "CEVI_1", "CEVI_2", "VGTCEVI_1", "VGTCEVI_2",
                        "VGT_LG_1", "VGT_LG_2", "LG_1", "LG_2")
-  }
+  # }
   NAvalue(inrast)   <- -999
   data_delta  <- extract_rast(inrast, validation_delta, join_geom = FALSE,
                               join_feat_tbl = F, full_data = TRUE, verbose = FALSE)
@@ -89,14 +100,15 @@ for (yy in 1:length(years)) {
 
 }
 
-data_delta  <- data.table::rbindlist(do.call(c,lapply(data_delta_l, "[", 1)))
-data_valley <- data.table::rbindlist(do.call(c,lapply(data_valley_l, "[", 1)))
-data_sen    <- data.table::rbindlist(do.call(c,lapply(data_sen_l, "[", 1)))
+data_delta  <- data.table::rbindlist(do.call(c,lapply(data_delta_l, "[", 2)))
+data_valley <- data.table::rbindlist(do.call(c,lapply(data_valley_l, "[", 2)))
+data_sen    <- data.table::rbindlist(do.call(c,lapply(data_sen_l, "[", 2)))
+
 
 save(data_delta,
      data_valley,
      data_sen,
-     file = "/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/statistics_modis/extract_rast_mask_ONLY_SEN.RData")
+     file = out_stats_file_extract)
 
 
 # save(data_sen,

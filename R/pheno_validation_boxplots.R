@@ -25,7 +25,7 @@ validation_valley <- read_vect(
   st_transform((proj4string(r))) %>%
   dplyr::select(id)
 
-inpheno <- read.csv("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/Datasets/Pheno_Validation/Pheno_Validation_data_arrondissements.csv", stringsAsFactors = FALSE)
+inpheno <- read.csv("/home/lb/Google_Drive/IREA/Conference&paper/PhenoRice_SRV/", stringsAsFactors = FALSE)
 inpheno <- as_tibble(inpheno) %>%
   dplyr::mutate(sowdate = as.Date(sowdate, format = "%d/%m/%y")) %>%
   dplyr::mutate(harvdate = as.Date(harvdate, format = "%d/%m/%y")) %>%

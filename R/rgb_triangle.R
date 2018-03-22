@@ -4,7 +4,7 @@ library(grid) # required for grid.raster(.)
 # numPix should be an integer,
 # and gapX < (numPix / 2)
 # where gapX is the minimum number of horizontal pixels from the triangle to the edge of the image
-RGBTriangle <- function(numPix = 100, gapX = 10, doSmoothing=FALSE) {
+RGBTriangle <- function(numPix = 1000, gapX = 10, doSmoothing=FALSE) {
   # the verticle gap between the triangle and edge of image
   gapY            <- round(numPix * ( 0.5 - sqrt(3)/4) + gapX * sqrt(3)/2)
 
